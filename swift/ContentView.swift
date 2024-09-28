@@ -8,6 +8,54 @@
 import SwiftUI
 import AVFoundation
 import Speech
+import UIKit
+import Starscream
+
+class ViewController: UIViewController, WebSocketDelegate {
+    var socket: WebSocket!
+
+    override func viewDidLoad(){
+        super.viewDidLoad()
+        var request = URLRequest(url: URL(string: "ws://localhost:3001/socket.io/?EIO=4&transport=websocket")!)
+        request.timeoutInterval = 5
+        socket = WebSocket(request: request)
+        socket.delegate = self
+        socket.connect()
+    }
+
+    func didReceive(event: WebSocketEvent, client: WebSocket){
+        switch event{
+        case .connected(let headers):
+            print("WebSocket is connected: \(headers)")
+        case .disconnected(let reason, let code):
+            print("WebSocket is disconnected: \(reason) with code: \(code)")
+        case .text(let text):
+            print("Received text: \(text)")
+        case .binary(let data):
+            print("Received data: \(data.count)")
+        case .ping(_):
+            break
+        case .pong(_):
+            break
+        case .viabilityChanged(_):
+            break
+        case .reconnectSuggested(_):
+            break
+        case .cancelled:
+            print("WebSocket connection cancelled")
+        case .error(let error):
+            print("WebSocket error: \(String(describing: error))")
+        }
+    }
+
+    func sendMessage(message: String){
+        socket.write(string: message)
+    }
+
+    func disconnect(){
+        socket.disconnect()
+    }
+}
 
 struct AudioCaptureView: View {
     @State private var audioRecorder: AVAudioRecorder!
