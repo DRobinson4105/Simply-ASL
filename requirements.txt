@@ -13,3 +13,5 @@ langchain
 langchain-community
 openai
 dotenv
+pandas
+torch
