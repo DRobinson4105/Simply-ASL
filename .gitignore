@@ -1,2 +1,5 @@
 .venv
-h3wb_train.npz
+*.json
+*.csv
+*.npz
+__pycache__
