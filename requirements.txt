@@ -9,3 +9,7 @@ filterpy
 scikit-image
 opencv-python
 ipython
+langchain
+langchain-community
+openai
+dotenv

@@ -3,3 +3,4 @@
 *.csv
 *.npz
 __pycache__
+.env
