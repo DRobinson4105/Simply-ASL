@@ -1,29 +1,24 @@
-from flask import Flask
-from flask_socketio import SocketIO
+from flask import Flask, request, jsonify
+from utils import text2gloss  # Import the function from utils.py
 
 app = Flask(__name__)
-    
-socketio = SocketIO(app,debug=True,cors_allowed_origins='*',async_mode='eventlet')
 
-@app.route("/")
-def alive():
-    return '<h1>I\'m Alive!<h1/>'
+@app.route('/receive-text', methods=['POST'])
+def receive_text():
+    # Get the recognized text from the request
+    data = request.get_json()
+    recognized_text = data.get('recognizedText')
 
-@socketio.on('connect')
-def handle_connect():
-    print("User Connected")
-    emit('connected', {'message': 'You are connected :3!'})
+    # Check if recognized text is present
+    if not recognized_text:
+        return jsonify({"error": "No text provided"}), 400
 
-@socketio.on('disconnect')
-def handle_disconnect():
-    print('User disconnected')
-
-@socketio.on('message')
-def handle_message(msg):
-    print(f"Received msg: {msg}")
-    send(f"Echoechoechoechoechoecho: {msg}")
+    # Convert recognized text to ASL gloss
+    try:
+        gloss = text2gloss(recognized_text)
+        return jsonify({"message": "Text processed successfully", "text": recognized_text, "gloss": gloss})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=3001)
-    
-# flask --app server run 
+    app.run(host='0.0.0.0', port=5000)
