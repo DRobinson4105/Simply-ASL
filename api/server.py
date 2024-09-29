@@ -19,7 +19,6 @@ def receive_text():
         gloss = text2gloss(recognized_text)
         pose1 = gloss2pose(gloss)
         pose2 = np.array(intermediatePose(pose1))
-        print(pose2.shape)
 
         return jsonify({"message": "Text processed successfully", "text": recognized_text, "gloss": gloss})
     except Exception as e:

@@ -16,10 +16,7 @@ custom_prompt = """
 Human: Here are some examples of translations from English text to ASL gloss:
 Examples:
 Apples ==> APPLE
-you  ==> IX-2P
-your  ==> IX-2P
 Love ==> LIKE
-My ==> IX-1P
 Thanks ==> THANK-YOU
 am ==> 
 and ==> 
@@ -32,6 +29,7 @@ type of ==> TYPE
 ? ==> QUESTION
 Watch ==> SEE
 My name is David ==> MY NAME D-A-V-I-D
+I missed it last week ==> LAST WEEK I MISS
 
 {history}
 Human: {input}
@@ -51,16 +49,17 @@ conversation_chain = ConversationChain(
 )
 
 def text2gloss(text):
+    text = text.replace('?', '').replace('-', '')
     return conversation_chain.invoke(input=text)['response'][7:-8]
 
 def __load_frames__(token):
     curr = []
-    path = Path(f"../frame_dataset/{token}_0000.npy")
+    path = Path(f"../frame_dataset/{token}.npy")
     i = 0
 
     while path.is_file():
         curr.append(np.load(path))
-        path = Path(f"../frame_dataset/{token}_{i:04d}.npy")
+        path = Path(f"../frame_dataset/{token}.npy")
         i += 1
 
 def gloss2pose(gloss):
@@ -68,23 +67,42 @@ def gloss2pose(gloss):
     tokens = gloss.split()
 
     for token in tokens:
-        if Path(f"../frame_dataset/{token}_0000.npy").is_file():
-            pose.append(__load_frames__(token))
+        if Path(f"../pose_dataset/{token}.npy").is_file():
+            pose.append(np.load(f"../pose_dataset/{token}.npy"))
         else:
             for c in token:
-                if Path(f"../frame_dataset/{c}_0000.npy").is_file():
-                    pose.append(__load_frames__(c))
+                if Path(f"../pose_dataset/{c}.npy").is_file():
+                    pose.append(np.load(f"../pose_dataset/{c}.npy"))
 
     return pose
 
-
 def intermediatePose(pose):
     if len(pose) == 0: return []
+    print(len(pose))
 
-    lst = pose[0]
+    num_frames = 30
+    result = [pose[0]]
+    
+    for i in range(1, len(pose)):
+        start_frame = pose[i-1][-1]
+        end_frame = pose[i][0]
 
-    for j in range(1, len(pose)):
-        lst.extend([lst[j-1][-1] + i * (lst[i][0] - lst[j-1][-1]) / 31 for i in range(1, 31)])
-        lst.extend(pose[j])
+        interpolated_frames = np.zeros((num_frames, 133, 3))
 
-    return lst
+        for j in range(num_frames):
+            diff = i / (num_frames - 1)
+            interpolated_frames[i] = (1 - diff) * start_frame + diff * end_frame
+
+        result.append(interpolated_frames)
+        result.append(pose[i])
+    
+    result = np.concatenate(result, axis=0)
+    return result
+
+if __name__ == "__main__":
+    text = "I missed it last week"
+    gloss = text2gloss(text)
+    print(gloss)
+    pose1 = gloss2pose(gloss)
+    pose2 = np.array(intermediatePose(pose1))
+    print(pose2.shape)
