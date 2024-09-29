@@ -24,8 +24,6 @@ async def receive_text():
         # Turn pose2 into a video and save it
         output_video_path = 'output.mp4'  # Save the video in a directory
         pose2video(pose2)  # Assuming pose2video saves the video
-        
-        time.sleep(8)
 
         # Return the video file as a response
         if os.path.exists(output_video_path):

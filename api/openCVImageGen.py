@@ -3,6 +3,7 @@ from math import floor
 from numpy import array
 import cv2
 import json
+import os
 # Full connection array for the entire skeleton based on the keypoints image
 
 width = 960
@@ -149,10 +150,12 @@ def generate_scene(keypoint_frame):
     return image
 
 def getVideo(np_keypoint_frame):
-    video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'MJPG'), 30,(1110, 1110), isColor=True)
+    video = cv2.VideoWriter("output2.mp4", cv2.VideoWriter_fourcc(*'MJPG'), 30,(1110, 1110), isColor=True)
 
     for frame in np_keypoint_frame:
         video_frame = generate_scene(frame)
         video.write(video_frame)
+        
+    os.rename("output2.mp4", "output.mp4")
 
     return video
