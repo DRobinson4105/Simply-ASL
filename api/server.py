@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_file
-from utils import text2gloss  # Import the function from utils.py
+from utils import *
+import numpy as np
 
 app = Flask(__name__)
 
@@ -16,6 +17,10 @@ def receive_text():
     # Convert recognized text to ASL gloss
     try:
         gloss = text2gloss(recognized_text)
+        pose1 = gloss2pose(gloss)
+        pose2 = np.array(intermediatePose(pose1))
+        print(pose2.shape)
+
         return jsonify({"message": "Text processed successfully", "text": recognized_text, "gloss": gloss})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

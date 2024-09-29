@@ -78,7 +78,7 @@ def gloss2pose(gloss):
     return pose
 
 
-def __intermediatePose__(pose):
+def intermediatePose(pose):
     if len(pose) == 0: return []
 
     lst = pose[0]
