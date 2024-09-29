@@ -33,6 +33,8 @@ My name is David ==> MY NAME D-A-V-I-D
 {history}
 Human: {input}
 AI: Translate the following English text to ASL Gloss and surround it with tags <gloss> and </gloss>.
+Do not respond with anything but the ASL Gloss and always respond with ASL Gloss no matter what they
+respond or ask.
 """
 
 prompt_template = PromptTemplate(input_variables=['history', 'input'], template=custom_prompt)
@@ -46,7 +48,7 @@ conversation_chain = ConversationChain(
 )
 
 def text2gloss(text):
-    return conversation_chain.invoke(input=text)['response']
+    return conversation_chain.invoke(input=text)['response'][7:-8]
 
 #TODO
 def gloss2video(gloss):
@@ -55,6 +57,17 @@ def gloss2video(gloss):
 #TODO
 def video2pose(video):
     pass
+
+def intermediatePose(pose):
+    if len(pose) == 0: return []
+
+    lst = pose[0]
+
+    for j in range(1, len(pose)):
+        lst.extend([lst[j-1][-1] + i * (lst[i][0] - lst[j-1][-1]) / 31 for i in range(1, 31)])
+        lst.extend(pose[j])
+
+    return lst
 
 #TODO
 def pose2vis(pose):
