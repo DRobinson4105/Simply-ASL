@@ -3,6 +3,9 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
 from dotenv import load_dotenv
+import os
+from pathlib import Path
+import numpy as np
 
 # Initialize the conversation chain globally
 load_dotenv()
@@ -50,15 +53,32 @@ conversation_chain = ConversationChain(
 def text2gloss(text):
     return conversation_chain.invoke(input=text)['response'][7:-8]
 
-#TODO
-def gloss2video(gloss):
-    pass
+def __load_frames__(token):
+    curr = []
+    path = Path(f"../frame_dataset/{token}_0000.npy")
+    i = 0
 
-#TODO
-def video2pose(video):
-    pass
+    while path.is_file():
+        curr.append(np.load(path))
+        path = Path(f"../frame_dataset/{token}_{i:04d}.npy")
+        i += 1
 
-def intermediatePose(pose):
+def gloss2pose(gloss):
+    pose = []
+    tokens = gloss.split()
+
+    for token in tokens:
+        if Path(f"../frame_dataset/{token}_0000.npy").is_file():
+            pose.append(__load_frames__(token))
+        else:
+            for c in token:
+                if Path(f"../frame_dataset/{c}_0000.npy").is_file():
+                    pose.append(__load_frames__(c))
+
+    return pose
+
+
+def __intermediatePose__(pose):
     if len(pose) == 0: return []
 
     lst = pose[0]
@@ -72,10 +92,3 @@ def intermediatePose(pose):
 #TODO
 def pose2vis(pose):
     pass
-
-def visualize(text):
-    gloss = text2gloss(text)
-    video = gloss2video(gloss)
-    pose = video2pose(video)
-    vis = pose2vis(pose)
-    return vis
