@@ -17,6 +17,7 @@
 		951DE1D72CA7EDF400839CD7 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		951DE1D92CA7EDF600839CD7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		951DE1DC2CA7EDF600839CD7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		95AD9F7E2CA8CF4500844668 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +50,7 @@
 		951DE1D42CA7EDF400839CD7 /* asl */ = {
 			isa = PBXGroup;
 			children = (
+				95AD9F7E2CA8CF4500844668 /* Info.plist */,
 				951DE1D72CA7EDF400839CD7 /* ContentView.swift */,
 				951DE1D92CA7EDF600839CD7 /* Assets.xcassets */,
 				951DE1DB2CA7EDF600839CD7 /* Preview Content */,
@@ -279,6 +281,9 @@
 				DEVELOPMENT_TEAM = 26MKTVV8MS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = asl/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "To collect audio";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "To Recognize Sppech";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -308,6 +313,9 @@
 				DEVELOPMENT_TEAM = 26MKTVV8MS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = asl/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "To collect audio";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "To Recognize Sppech";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

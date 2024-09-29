@@ -1,29 +1,27 @@
 import SwiftUI
+import AVKit
 import AVFoundation
 import Speech
 
 struct AudioCaptureView: View {
     @State private var audioEngine = AVAudioEngine()
     @State private var recognitionTask: SFSpeechRecognitionTask?
-    @State private var recognizedText = ""  // Text for recognized speech
     @State private var recognitionStatus = "Press Start to Record"  // Text for displaying status
     @State private var isRecording = false
     @State private var silenceTimer: Timer?  // Timer to track silence
     @State private var lastRecognitionTime = Date()  // To track the last recognized speech time
+    @State private var player: AVPlayer?  // AVPlayer to handle video playback
     
     var body: some View {
         VStack {
-            // Display the recognition status (enabled, detecting, etc.)
-            Text(recognitionStatus)
-                .padding()
-                .foregroundColor(.gray)
-                .font(.subheadline)
-
-            // Display the recognized words
-            Text(recognizedText)
-                .padding()
-                .foregroundColor(.black)
-                .font(.headline)
+            // Video display area, shows only when the video is received
+            if let player = player {
+                VideoPlayer(player: player)
+                    .frame(height: 300)
+                    .onAppear {
+                        player.play()  // Auto-play video when it appears
+                    }
+            }
 
             // Start/Stop Recording Button
             Button(action: {
@@ -40,6 +38,12 @@ struct AudioCaptureView: View {
                     .cornerRadius(10)
             }
             .padding()
+
+            // Display the recording status (moved below the button)
+            Text(recognitionStatus)
+                .padding()
+                .foregroundColor(.gray)
+                .font(.subheadline)
         }
         .onAppear {
             requestSpeechRecognitionAuthorization()
@@ -72,7 +76,7 @@ struct AudioCaptureView: View {
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
             isRecording = true
-            recognitionStatus = "Listening..."
+            recognitionStatus = "Recording in Progress..."
             lastRecognitionTime = Date()
             startListening()  // Start recognizing speech
             startSilenceTimer()  // Start the silence detection timer
@@ -90,10 +94,13 @@ struct AudioCaptureView: View {
 
         isRecording = false
         recognitionStatus = "Recording Stopped"
-        
+
         // Send recognized text to Flask server
-        sendRecognizedTextToServer(text: recognizedText)
+        sendRecognizedTextToServer()
         stopSilenceTimer()
+        
+        // Fetch video from server
+        fetchVideoFromServer()
     }
 
     func startListening() {
@@ -110,10 +117,9 @@ struct AudioCaptureView: View {
 
         recognitionTask = recognizer.recognitionTask(with: request) { result, error in
             if let result = result {
-                // Update recognized text dynamically
                 DispatchQueue.main.async {
-                    recognizedText = result.bestTranscription.formattedString
-                    recognitionStatus = "Recognizing Speech..."
+                    // Update only whether it is still recording or not
+                    recognitionStatus = "Recording in Progress..."
                     lastRecognitionTime = Date()  // Reset the last recognition time
                 }
             }
@@ -140,8 +146,8 @@ struct AudioCaptureView: View {
         }
     }
 
-    // Function to send recognized text to Flask server
-    func sendRecognizedTextToServer(text: String) {
+    // Function to send recognized text to Flask server (dummy text, for demo purposes)
+    func sendRecognizedTextToServer() {
         guard let url = URL(string: "http://10.110.227.184:5000/receive-text") else {
             print("Invalid URL")
             return
@@ -152,7 +158,7 @@ struct AudioCaptureView: View {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let parameters: [String: Any] = [
-            "recognizedText": text
+            "recognizedText": "Some recognized text"
         ]
 
         do {
@@ -181,12 +187,35 @@ struct AudioCaptureView: View {
         task.resume()
     }
 
+    // Fetch video from the server after recording
+    func fetchVideoFromServer() {
+        guard let url = URL(string: "http://10.110.227.184:5000/video") else {
+            print("Invalid video URL")
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Error fetching video: \(error.localizedDescription)")
+                return
+            }
+
+            DispatchQueue.main.async {
+                // Assign the URL to AVPlayer and auto-play
+                self.player = AVPlayer(url: url)
+                self.player?.play()  // Ensure the video starts playing automatically
+            }
+        }
+
+        task.resume()
+    }
+
     // Start silence timer for 2.5 seconds
     func startSilenceTimer() {
         silenceTimer?.invalidate()  // Invalidate any previous timer
         silenceTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             let silenceDuration = Date().timeIntervalSince(self.lastRecognitionTime)
-            if silenceDuration >= 2.5 {
+            if silenceDuration >= 4.02 {
                 self.stopRecording()  // Stop recording if silence is detected for 2.5 seconds
             }
         }
@@ -211,11 +240,5 @@ struct asl: App {
         WindowGroup {
             ContentView()
         }
-    }
-}
-
-struct AudioCaptureView_Previews: PreviewProvider {
-    static var previews: some View {
-        AudioCaptureView()
     }
 }
