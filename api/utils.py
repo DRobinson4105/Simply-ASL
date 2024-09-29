@@ -69,18 +69,17 @@ def gloss2pose(gloss):
     tokens = gloss.split()
 
     for token in tokens:
-        if Path(f"../frame_dataset/{token}.npy").is_file():
-            pose.append(np.load(f"../frame_dataset/{token}.npy"))
+        if Path(f"../pose_dataset/{token}.npy").is_file():
+            pose.append(np.load(f"../pose_dataset/{token}.npy"))
         else:
             for c in token:
-                if Path(f"../frame_dataset/{c}.npy").is_file():
-                    pose.append(np.load(f"../frame_dataset/{c}.npy"))
+                if Path(f"../pose_dataset/{c}.npy").is_file():
+                    pose.append(np.load(f"../pose_dataset/{c}.npy"))
 
     return pose
 
 def intermediatePose(pose):
     if len(pose) == 0: return []
-    print(len(pose))
 
     num_frames = 30
     result = [pose[0]]
@@ -92,8 +91,8 @@ def intermediatePose(pose):
         interpolated_frames = np.zeros((num_frames, 133, 3))
 
         for j in range(num_frames):
-            diff = i / (num_frames - 1)
-            interpolated_frames[i] = (1 - diff) * start_frame + diff * end_frame
+            diff = j / (num_frames - 1)
+            interpolated_frames[j] = (1 - diff) * start_frame + diff * end_frame
 
         result.append(interpolated_frames)
         result.append(pose[i])
@@ -103,20 +102,15 @@ def intermediatePose(pose):
 
 def pose2video(nparray):
     return getVideo(nparray)
-    
-
 
 if __name__ == "__main__":
     text = "I missed it last week"
     gloss = text2gloss(text)
-    print("WHOOSH!")
     print(gloss)
     pose1 = gloss2pose(gloss)
-    print("WHOOSH!")
 
-    print(pose1)
+    print(len(pose1), pose1[0].shape)
     pose2 = np.array(intermediatePose(pose1))
-    print("WHOOSH!")
-
-    print(pose2)
+    
+    print(pose2.shape)
     video = pose2video(pose2)
