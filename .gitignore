@@ -8,3 +8,4 @@ __pycache__
 /dataset
 /sapiens
 /sapiens-pose-coco
+/checkpointmm

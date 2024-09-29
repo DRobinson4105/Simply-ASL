@@ -1,0 +1,1 @@
+Lightweight alternative to sapiens for 2d pose estimation, run with checkpoints given for mmpose on their website.
