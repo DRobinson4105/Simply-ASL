@@ -4,6 +4,7 @@ from numpy import array
 import cv2
 import json
 import os
+from subprocess import call
 # Full connection array for the entire skeleton based on the keypoints image
 
 width = 960
@@ -157,5 +158,7 @@ def getVideo(np_keypoint_frame):
         video.write(video_frame)
         
     os.rename("output2.mp4", "output.mp4")
+
+    call(["python", "display.py"])
 
     return video
