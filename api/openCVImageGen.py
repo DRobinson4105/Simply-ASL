@@ -149,11 +149,10 @@ def generate_scene(keypoint_frame):
     return image
 
 def getVideo(np_keypoint_frame):
-    video = cv2.VideoWriter("output.avi", cv2.VideoWriter_fourcc(*'MJPG'), 30,(1110, 1110), isColor=True)
+    video = cv2.VideoWriter("output.mp4", cv2.VideoWriter_fourcc(*'MJPG'), 30,(1110, 1110), isColor=True)
 
     for frame in np_keypoint_frame:
         video_frame = generate_scene(frame)
-        for _ in range(5):
-            video.write(video_frame)
+        video.write(video_frame)
 
     return video

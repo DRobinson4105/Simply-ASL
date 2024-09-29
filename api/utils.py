@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 import numpy as np
+from openCVImageGen import getVideo
+import cv2
 
 # Initialize the conversation chain globally
 load_dotenv()
@@ -54,12 +56,12 @@ def text2gloss(text):
 
 def __load_frames__(token):
     curr = []
-    path = Path(f"../frame_dataset/{token}.npy")
+    path = Path(f"../pose_dataset/{token}.npy")
     i = 0
 
     while path.is_file():
         curr.append(np.load(path))
-        path = Path(f"../frame_dataset/{token}.npy")
+        path = Path(f"../pose_dataset/{token}.npy")
         i += 1
 
 def gloss2pose(gloss):
@@ -67,12 +69,12 @@ def gloss2pose(gloss):
     tokens = gloss.split()
 
     for token in tokens:
-        if Path(f"../pose_dataset/{token}.npy").is_file():
-            pose.append(np.load(f"../pose_dataset/{token}.npy"))
+        if Path(f"../frame_dataset/{token}.npy").is_file():
+            pose.append(np.load(f"../frame_dataset/{token}.npy"))
         else:
             for c in token:
-                if Path(f"../pose_dataset/{c}.npy").is_file():
-                    pose.append(np.load(f"../pose_dataset/{c}.npy"))
+                if Path(f"../frame_dataset/{c}.npy").is_file():
+                    pose.append(np.load(f"../frame_dataset/{c}.npy"))
 
     return pose
 
@@ -99,10 +101,22 @@ def intermediatePose(pose):
     result = np.concatenate(result, axis=0)
     return result
 
+def pose2video(nparray):
+    return getVideo(nparray)
+    
+
+
 if __name__ == "__main__":
     text = "I missed it last week"
     gloss = text2gloss(text)
+    print("WHOOSH!")
     print(gloss)
     pose1 = gloss2pose(gloss)
+    print("WHOOSH!")
+
+    print(pose1)
     pose2 = np.array(intermediatePose(pose1))
-    print(pose2.shape)
+    print("WHOOSH!")
+
+    print(pose2)
+    video = pose2video(pose2)
