@@ -88,7 +88,3 @@ def __intermediatePose__(pose):
         lst.extend(pose[j])
 
     return lst
-
-#TODO
-def pose2vis(pose):
-    pass
