@@ -85,7 +85,7 @@ def intermediatePose(pose):
     result = [pose[0]]
     
     for i in range(1, len(pose)):
-        start_frame = pose[i-1][-1]
+        start_frame = pose[i-1][-3]
         end_frame = pose[i][0]
 
         interpolated_frames = np.zeros((num_frames, 133, 3))
@@ -107,10 +107,11 @@ if __name__ == "__main__":
     text = "I missed it last week"
     gloss = text2gloss(text)
     print(gloss)
-    pose1 = gloss2pose(gloss)
-
-    print(len(pose1), pose1[0].shape)
-    pose2 = np.array(intermediatePose(pose1))
     
+    pose1 = gloss2pose(gloss)
+    print(len(pose1), pose1[0].shape)
+    
+    pose2 = np.array(intermediatePose(pose1))
     print(pose2.shape)
+
     video = pose2video(pose2)
