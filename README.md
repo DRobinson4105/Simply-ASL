@@ -1,6 +1,5 @@
 # Simply ASL
 
-
 ## Installation
 ```bash
 git clone https://github.com/DRobinson4105/Simply-ASL.git
