@@ -7,7 +7,7 @@ git clone https://github.com/DRobinson4105/Simply-ASL.git
 cd Simply-ASL
 conda create -n simply_asl python=3.11
 conda activate simply_asl
-pip install -r requirements.txt
+conda install -r requirements.txt
 ```
 and install PyTorch following the [official instructions](https://pytorch.org/get-started/locally/)
 
